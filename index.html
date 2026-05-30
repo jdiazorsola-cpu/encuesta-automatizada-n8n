@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- [SEGURIDAD] Content Security Policy (CSP) para prevenir inyección de scripts no autorizados -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.airtable.com http://localhost:5678; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';">
+    <!-- [SEGURIDAD] X-Content-Type-Options para evitar MIME-sniffing -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <title>Evaluación del Curso Antigravity</title>
+    <style>
+        /* === 1. Variables globales (:root) === */
+        :root {
+            /* Paleta Dark Mode Premium - Black & Yellow */
+            --bg-base: #050505;
+            --bg-surface: rgba(255, 255, 255, 0.04);
+            --bg-elevated: rgba(255, 255, 255, 0.02);
+            --accent-primary: #FFD700;
+            --accent-glow: #FFEE82;
+            --text-primary: #E8EAED;
+            --text-muted: #9AA0B2;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(255, 215, 0, 0.3);
+            --error: #FF4D6D;
+            --error-bg: rgba(255, 77, 109, 0.05);
+            
+            /* Dimensiones, Efectos y Transiciones */
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
+            --shadow-elevation: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --shadow-glow: 0 0 16px rgba(255, 215, 0, 0.4);
+            --blur-glass: blur(12px);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Tipografía (System-font stack) */
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
+        /* === 2. Reset y base (body, *) === */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: radial-gradient(circle at center, #1A1A1A 0%, #050505 100%);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* Scrollbar personalizado en tema oscuro */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-base);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-subtle);
+            border-radius: var(--radius-sm);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* === 3. Layout y contenedor === */
+        .container {
+            width: 100%;
+            max-width: 680px;
+            background: var(--bg-surface);
+            backdrop-filter: var(--blur-glass);
+            -webkit-backdrop-filter: var(--blur-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-elevation);
+            overflow: hidden;
+            margin: 1rem 0 3rem 0;
+        }
+
+        /* === 4. Header y título === */
+        .header {
+            background: linear-gradient(135deg, #050505 0%, #1A1A1A 50%, #0D0D0D 100%);
+            color: var(--text-primary);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid transparent;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            opacity: 0.5;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+        }
+
+        form, #successScreen {
+            padding: 2.75rem 2.25rem; /* +4px padding for premium perception */
+        }
+
+        /* === 5. Fieldsets y labels === */
+        .form-group {
+            margin-bottom: 2.5rem; /* Gap generoso 2rem+ */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group:last-of-type {
+            margin-bottom: 2.5rem;
+        }
+
+        label, legend {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            display: block;
+            letter-spacing: 0.01em;
+        }
+
+        legend {
+            padding: 0;
+            width: 100%;
+        }
+
+        .required {
+            color: var(--error);
+            margin-left: 0.25rem;
+            font-weight: normal;
+        }
+
+        /* === 6. Botones Likert === */
+        .likert-group {
+            border: none;
+            padding: 0;
+            margin: 0 0 2.5rem 0;
+        }
+
+        .likert-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .scale-btn {
+            flex: 1;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            padding: 0.875rem 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .scale-btn:hover {
+            border-color: var(--accent-primary);
+            background: rgba(255, 215, 0, 0.05);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .scale-btn:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
+        .scale-btn.selected {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-glow));
+            border-color: transparent;
+            color: #000000;
+            box-shadow: var(--shadow-glow);
+            transform: scale(1.02);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .likert-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .error-msg {
+            color: var(--error);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            min-height: 1.25rem;
+            font-weight: 500;
+        }
+
+        .has-error input[type="text"],
+        .has-error textarea,
+        .has-error .scale-btn {
+            border-color: var(--error);
+        }
+
+        .has-error .scale-btn {
+            background-color: var(--error-bg);
+            color: var(--error);
+        }
+
+        /* === 7. Input, Textarea === */
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition-smooth);
+            background-color: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        input[type="text"]::placeholder,
+        textarea::placeholder {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 1px var(--accent-primary), var(--shadow-glow);
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        /* === 8. Botón submit === */
+        .submit-btn,
+        .reset-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-glow));
+            color: #000000;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 1.125rem 1rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: var(--shadow-glow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before,
+        .reset-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .submit-btn:hover::before,
+        .reset-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover,
+        .reset-btn:hover {
+            box-shadow: 0 0 24px rgba(255, 215, 0, 0.6);
+            transform: translateY(-1px);
+        }
+        
+        .submit-btn:active,
+        .reset-btn:active {
+            transform: scale(0.98);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .submit-btn:focus-visible,
+        .reset-btn:focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* === 9. Pantalla de confirmación y JSON preview === */
+        .success-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .success-header h2 {
+            color: var(--accent-glow);
+            font-size: 1.75rem;
+            margin-bottom: 0.75rem;
+            text-shadow: 0 0 8px rgba(255, 238, 130, 0.3);
+        }
+        
+        .success-header p {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+        }
+
+        .data-summary {
+            background: var(--bg-base);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .data-summary h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        pre {
+            color: var(--text-primary);
+            border-radius: var(--radius-sm);
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            background: transparent;
+        }
+        
+        /* Tema del Syntax Highlighter */
+        pre .string { color: #A6E22E; }
+        pre .number { color: #FD971F; }
+        pre .key { color: #66D9EF; }
+        pre .boolean { color: #AE81FF; }
+        pre .null { color: #F92672; }
+
+        /* === 10. Componente Ticket Animado === */
+        @keyframes ticketReveal {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes drawCheck {
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes fadeSlideUp {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .ticket-success {
+            max-width: 340px;
+            margin: 0 auto 2.5rem auto;
+            background: var(--bg-surface);
+            backdrop-filter: var(--blur-glass);
+            -webkit-backdrop-filter: var(--blur-glass);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            animation: ticketReveal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            box-shadow: var(--shadow-glow);
+            text-align: left;
+        }
+
+        .ticket-check {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .checkmark-svg {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 3;
+            stroke: var(--accent-primary);
+            stroke-miterlimit: 10;
+        }
+
+        .checkmark-svg circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            fill: none;
+            animation: drawCheck 0.4s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .checkmark-svg path {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            fill: none;
+            animation: drawCheck 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.4s forwards;
+            filter: drop-shadow(0 0 4px var(--accent-primary));
+        }
+
+        .ticket-badge {
+            background: rgba(255, 215, 0, 0.15);
+            color: var(--accent-glow);
+            padding: 0.35rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: block;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .ticket-divider {
+            border-top: 2px dashed rgba(255, 215, 0, 0.4);
+            margin: 1.5rem 0;
+            opacity: 0;
+            animation: fadeSlideUp 0.4s ease forwards 0.7s;
+        }
+
+        .ticket-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .ticket-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            opacity: 0;
+        }
+        
+        .ticket-row:nth-child(1) { animation: fadeSlideUp 0.4s ease forwards 0.8s; }
+        .ticket-row:nth-child(2) { animation: fadeSlideUp 0.4s ease forwards 0.9s; }
+        .ticket-row:nth-child(3) { animation: fadeSlideUp 0.4s ease forwards 1.0s; }
+
+        .ticket-row svg {
+            color: var(--accent-primary);
+            flex-shrink: 0;
+        }
+
+        /* === 11. Media queries === */
+        @media (min-width: 640px) {
+            body {
+                align-items: center;
+            }
+            .container {
+                margin: 2rem 0;
+            }
+            .header {
+                padding: 3rem 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .likert-container {
+                gap: 0.25rem;
+            }
+            .scale-btn {
+                padding: 0.75rem 0;
+                font-size: 1rem;
+            }
+            .likert-labels {
+                font-size: 0.75rem;
+            }
+            form, #successScreen {
+                padding: 2.25rem 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <!-- Encabezado con Gradiente Corporativo -->
+        <header class="header">
+            <h1>Evaluación de Curso</h1>
+            <p>Antigravity</p>
+        </header>
+
+        <!-- Formulario (novalidate para manejar validación custom en JS) -->
+        <form id="evaluationForm" novalidate>
+            <!-- 1. ID Estudiante -->
+            <div class="form-group">
+                <label for="id_estudiante">ID de Estudiante <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="id_estudiante" name="id_estudiante" required aria-required="true" placeholder="Ej. A12345678" autocomplete="off">
+                <div class="error-msg" id="error-id_estudiante" aria-live="polite"></div>
+            </div>
+
+            <!-- 2. Nivel de Satisfacción -->
+            <fieldset class="form-group likert-group" id="fs_nivel_satisfaccion">
+                <legend>Nivel de satisfacción general <span class="required" aria-hidden="true">*</span></legend>
+                <div class="likert-container" id="likert_nivel_satisfaccion" data-name="nivel_satisfaccion">
+                    <!-- Los botones se generan vía JS -->
+                </div>
+                <div class="likert-labels" aria-hidden="true">
+                    <span>Muy insatisfecho</span>
+                    <span>Muy satisfecho</span>
+                </div>
+                <div class="error-msg" id="error-nivel_satisfaccion" aria-live="polite"></div>
+                <input type="hidden" name="nivel_satisfaccion" id="nivel_satisfaccion" required>
+            </fieldset>
+
+            <!-- 3. Claridad del Contenido -->
+            <fieldset class="form-group likert-group" id="fs_claridad_contenido">
+                <legend>Claridad del contenido <span class="required" aria-hidden="true">*</span></legend>
+                <div class="likert-container" id="likert_claridad_contenido" data-name="claridad_contenido"></div>
+                <div class="likert-labels" aria-hidden="true">
+                    <span>Muy poco claro</span>
+                    <span>Muy claro</span>
+                </div>
+                <div class="error-msg" id="error-claridad_contenido" aria-live="polite"></div>
+                <input type="hidden" name="claridad_contenido" id="claridad_contenido" required>
+            </fieldset>
+
+            <!-- 4. Aplicabilidad Práctica -->
+            <fieldset class="form-group likert-group" id="fs_aplicabilidad_practica">
+                <legend>Aplicabilidad práctica <span class="required" aria-hidden="true">*</span></legend>
+                <div class="likert-container" id="likert_aplicabilidad_practica" data-name="aplicabilidad_practica"></div>
+                <div class="likert-labels" aria-hidden="true">
+                    <span>Nada aplicable</span>
+                    <span>Muy aplicable</span>
+                </div>
+                <div class="error-msg" id="error-aplicabilidad_practica" aria-live="polite"></div>
+                <input type="hidden" name="aplicabilidad_practica" id="aplicabilidad_practica" required>
+            </fieldset>
+
+            <!-- 5. Comentarios (Opcional) -->
+            <div class="form-group">
+                <label for="comentarios_adicionales">Comentarios adicionales</label>
+                <textarea id="comentarios_adicionales" name="comentarios_adicionales" rows="4" placeholder="Comparte tus pensamientos... (Opcional)"></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Enviar Evaluación</button>
+        </form>
+
+        <!-- Pantalla Post-Envío -->
+        <section id="successScreen" class="hidden" aria-hidden="true">
+            <div class="success-header">
+                <h2>¡Gracias por tu evaluación!</h2>
+                <p>Tus respuestas han sido registradas exitosamente.</p>
+            </div>
+            
+            <div class="ticket-success">
+                <div class="ticket-check">
+                    <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                        <circle cx="26" cy="26" r="25" fill="none"/>
+                        <path d="M14.1 27.2l7.1 7.2 16.7-16.8" fill="none"/>
+                    </svg>
+                </div>
+                <div class="ticket-badge">Evaluación registrada</div>
+                <div class="ticket-divider"></div>
+                <div class="ticket-body">
+                    <div class="ticket-row">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Satisfacción
+                    </div>
+                    <div class="ticket-row">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Claridad
+                    </div>
+                    <div class="ticket-row">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Aplicabilidad
+                    </div>
+                </div>
+            </div>
+            
+            <button type="button" id="resetBtn" class="reset-btn">Nueva respuesta</button>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Configuración de los campos Likert
+            const likertFields = [
+                { id: 'nivel_satisfaccion', name: 'Nivel de satisfacción general' },
+                { id: 'claridad_contenido', name: 'Claridad del contenido' },
+                { id: 'aplicabilidad_practica', name: 'Aplicabilidad práctica' }
+            ];
+
+            // 1. Generar botones Likert dinámicamente para mantener el HTML limpio
+            likertFields.forEach(field => {
+                const container = document.getElementById(`likert_${field.id}`);
+                for (let i = 1; i <= 5; i++) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'scale-btn';
+                    btn.textContent = i;
+                    btn.setAttribute('data-value', i);
+                    
+                    // Accesibilidad (WCAG 2.1)
+                    btn.setAttribute('aria-label', `Valor ${i} de 5 para ${field.name}`);
+                    btn.setAttribute('aria-pressed', 'false');
+                    
+                    btn.addEventListener('click', () => handleLikertSelection(field.id, i, container));
+                    container.appendChild(btn);
+                }
+            });
+
+            // 2. Manejar la selección y estados visuales (Pill/Card)
+            function handleLikertSelection(fieldId, value, container) {
+                const buttons = container.querySelectorAll('.scale-btn');
+                
+                // Deseleccionar todos
+                buttons.forEach(btn => {
+                    btn.classList.remove('selected');
+                    btn.setAttribute('aria-pressed', 'false');
+                });
+
+                // Seleccionar actual
+                const selectedBtn = container.querySelector(`[data-value="${value}"]`);
+                selectedBtn.classList.add('selected');
+                selectedBtn.setAttribute('aria-pressed', 'true');
+
+                // Actualizar valor y remover error
+                document.getElementById(fieldId).value = value;
+                clearError(fieldId);
+                container.closest('fieldset').classList.remove('has-error');
+            }
+
+            const form = document.getElementById('evaluationForm');
+            const successScreen = document.getElementById('successScreen');
+            const resetBtn = document.getElementById('resetBtn');
+
+            // 3. Funciones de Validación Visual (Inline)
+            function showError(fieldId, message) {
+                const errorDiv = document.getElementById(`error-${fieldId}`);
+                if(errorDiv) errorDiv.textContent = message;
+                
+                const fieldEl = document.getElementById(fieldId);
+                if (fieldEl && fieldEl.tagName === 'INPUT' && fieldEl.type === 'text') {
+                    fieldEl.parentElement.classList.add('has-error');
+                } else {
+                    const fs = document.getElementById(`fs_${fieldId}`);
+                    if (fs) fs.classList.add('has-error');
+                }
+            }
+
+            function clearError(fieldId) {
+                const errorDiv = document.getElementById(`error-${fieldId}`);
+                if (errorDiv) errorDiv.textContent = '';
+                
+                const fieldEl = document.getElementById(fieldId);
+                if (fieldEl && fieldEl.tagName === 'INPUT' && fieldEl.type === 'text') {
+                    fieldEl.parentElement.classList.remove('has-error');
+                }
+            }
+
+            function clearAllErrors() {
+                document.querySelectorAll('.error-msg').forEach(el => el.textContent = '');
+                document.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+            }
+
+            // --- 4. Funciones de Integración API ---
+            
+            // [SEGURIDAD] Función de sanitización básica contra XSS
+            const sanitizeInput = (str) => {
+                if (!str) return '';
+                return str.replace(/[&<>'"]/g, 
+                    tag => ({
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        "'": '&#39;',
+                        '"': '&quot;'
+                    }[tag])
+                );
+            };
+
+            const buildPayload = (formData, likertFields) => {
+                const data = {
+                    // [SEGURIDAD] Sanitizamos los inputs de texto libre antes de enviarlos
+                    id_estudiante: sanitizeInput(formData.get('id_estudiante').trim()),
+                    comentarios_adicionales: sanitizeInput(formData.get('comentarios_adicionales').trim()),
+                    timestamp: new Date().toISOString()
+                };
+                
+                likertFields.forEach(field => {
+                    data[field.id] = parseInt(formData.get(field.id), 10);
+                });
+                
+                return data;
+            };
+
+            const callAirtable = async (data) => {
+                // [AIRTABLE]
+                const AIRTABLE_BASE_ID = 'appjLkMIuefoxL4Oj';
+                const AIRTABLE_TABLE_ID = 'tblcu32QdWMvB7ypv';
+                
+                // [SEGURIDAD] Ofuscación paliativa del token. 
+                // ADVERTENCIA ARCH: En un entorno 100% estático esto NO es seguro. 
+                // Recomendación real: Mover esta llamada al backend o proxy serverless.
+                const tokenParts = [
+                    'patOvf', 'IdToNkJl2tQ', '.', '80cb1248821909a2',
+                    'c2a7f9c7b7279c1c', '33ba6a839d1dec30de73736a3e314fb8'
+                ];
+                const AIRTABLE_TOKEN = tokenParts.join('');
+                
+                const API_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`;
+
+                const payload = {
+                    records: [{
+                        fields: {
+                            "IDEstudiante": data.id_estudiante,
+                            "NivelSatisfacción": data.nivel_satisfaccion,
+                            "ClaridadContenido": data.claridad_contenido,
+                            "AplicabilidadPractica": data.aplicabilidad_practica,
+                            "ComentariosAdicionales": data.comentarios_adicionales
+                        }
+                    }]
+                };
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${AIRTABLE_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error ? errorData.error.message : `Airtable HTTP Error ${response.status}`);
+                }
+                return await response.json();
+            };
+
+            const callN8nWebhook = async (data) => {
+                // [N8N WEBHOOK]
+                // NOTA DEV: En modo TEST de n8n, activar "Execute workflow" en el canvas ANTES de enviar el formulario.
+                const N8N_WEBHOOK_URL = 'http://localhost:5678/webhook/a08860a5-4bf3-422b-b0cb-0911fc0a4054';
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+                try {
+                    const response = await fetch(N8N_WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data),
+                        signal: controller.signal
+                    });
+                    
+                    if (!response.ok) throw new Error(`n8n HTTP Error ${response.status}`);
+                    return await response.text();
+                } finally {
+                    clearTimeout(timeoutId);
+                }
+            };
+
+            // --- 5. Captura, Validación y Envío Paralelo ---
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                clearAllErrors();
+                
+                let isValid = true;
+                const formData = new FormData(form);
+                
+                // Validación: ID Estudiante
+                const idEstudiante = formData.get('id_estudiante').trim();
+                if (!idEstudiante) {
+                    showError('id_estudiante', 'El ID de estudiante es obligatorio.');
+                    isValid = false;
+                } else if (!/^[a-zA-Z0-9]+$/.test(idEstudiante)) {
+                    showError('id_estudiante', 'El ID debe ser un formato alfanumérico válido.');
+                    isValid = false;
+                }
+
+                // Validación: Campos Likert
+                likertFields.forEach(field => {
+                    if (!formData.get(field.id)) {
+                        showError(field.id, 'Por favor, selecciona una opción antes de continuar.');
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    // Accesibilidad: Foco en el primer error
+                    const firstError = document.querySelector('.has-error input, .has-error button');
+                    if (firstError) firstError.focus();
+                    return;
+                }
+
+                // Construcción de Payload
+                const data = buildPayload(formData, likertFields);
+
+                // Feedback UI: Estado "Enviando..."
+                const submitBtn = form.querySelector('.submit-btn');
+                const originalBtnText = submitBtn.textContent;
+                submitBtn.textContent = 'Enviando evaluación...';
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.7';
+                submitBtn.style.cursor = 'wait';
+                submitBtn.style.boxShadow = ''; // Reset error style if present
+
+                try {
+                    // [PARALLEL] Ejecución simultánea de integraciones
+                    const [airtableResult, n8nResult] = await Promise.allSettled([
+                        callAirtable(data),
+                        callN8nWebhook(data)
+                    ]);
+
+                    // [ERROR HANDLING] Evaluación de resultados individuales
+                    if (n8nResult.status === 'rejected') {
+                        // Falla webhook: Log discreto, no interrumpe UI
+                        console.warn('Advertencia (n8n webhook fallido):', n8nResult.reason);
+                    }
+
+                    if (airtableResult.status === 'rejected') {
+                        // Falla Airtable: Error bloqueante para el usuario
+                        console.error('Error crítico (Airtable):', airtableResult.reason);
+                        showError('id_estudiante', 'Hubo un problema al registrar tu evaluación. Intenta nuevamente.');
+                        submitBtn.style.boxShadow = '0 0 0 2px var(--error)';
+                        return; // Detenemos la transición de éxito
+                    }
+
+                    // Éxito (Airtable completado, webhook resuelto o rechazado)
+                    form.classList.add('hidden');
+                    form.setAttribute('aria-hidden', 'true');
+                    successScreen.classList.remove('hidden');
+                    successScreen.setAttribute('aria-hidden', 'false');
+
+                } catch (error) {
+                    console.error('Error inesperado:', error);
+                    showError('id_estudiante', 'Error de red inesperado. Por favor, verifica tu conexión.');
+                } finally {
+                    // Restaurar botón siempre al finalizar
+                    submitBtn.textContent = originalBtnText;
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '';
+                    submitBtn.style.cursor = '';
+                }
+            });
+
+            // 6. Reseteo del Flujo
+            resetBtn.addEventListener('click', () => {
+                form.reset();
+                
+                // Limpiar interactividad UI
+                document.querySelectorAll('.scale-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                    btn.setAttribute('aria-pressed', 'false');
+                });
+                likertFields.forEach(field => {
+                    document.getElementById(field.id).value = '';
+                });
+
+                // Restaurar vista inicial
+                successScreen.classList.add('hidden');
+                successScreen.setAttribute('aria-hidden', 'true');
+                form.classList.remove('hidden');
+                form.setAttribute('aria-hidden', 'false');
+                
+                document.getElementById('id_estudiante').focus();
+            });
+
+            // Feedback en tiempo real para ID
+            document.getElementById('id_estudiante').addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    clearError('id_estudiante');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
